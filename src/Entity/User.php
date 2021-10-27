@@ -63,7 +63,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $updated_at;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", length=10, nullable=true)
      */
     private $zip_code;
 
@@ -237,12 +237,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getZipCode(): ?int
+    public function getZipCode(): ?string
     {
         return $this->zip_code;
     }
 
-    public function setZipCode(?int $zip_code): self
+    public function setZipCode(?string $zip_code): self
     {
         $this->zip_code = $zip_code;
 
