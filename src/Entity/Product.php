@@ -22,7 +22,7 @@ class Product
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private $model;
 
     /**
      * @ORM\Column(type="text")
@@ -60,14 +60,14 @@ class Product
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getModel(): ?string
     {
-        return $this->name;
+        return $this->model;
     }
 
-    public function setName(string $name): self
+    public function setModel(string $model): self
     {
-        $this->name = $name;
+        $this->model = $model;
 
         return $this;
     }
