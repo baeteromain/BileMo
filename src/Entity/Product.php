@@ -5,9 +5,38 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *     normalizationContext={"groups"={"read:Product:collection"}},
+ *     denormalizationContext={"groups"={"write:Product:collection"}},
+ *     collectionOperations={
+ *          "get",
+ *          "post"={
+ *                  "security" = "is_granted('ROLE_ADMIN')",
+ *                  "security_message" = "Only admins can add products.",
+ *           }
+ *      },
+ *     itemOperations={
+ *          "get"={
+ *                 "normalization_context" = {"groups"={"read:Product:collection", "read:Product:item"}}
+ *           },
+ *           "put"={
+ *                 "security" = "is_granted('ROLE_ADMIN')",
+ *                 "security_message" = "Only admins can replace products.",
+ *           },
+ *            "patch"={
+ *                 "security" = "is_granted('ROLE_ADMIN')",
+ *                  "security_message" = "Only admins can update products.",
+ *           },
+ *            "delete"={
+ *                 "security" = "is_granted('ROLE_ADMIN')",
+ *                  "security_message" = "Only admins can delete products.",
+ *           }
+ *      }
+ * )
+ * @ORM\HasLifecycleCallbacks()
  * @ORM\Entity(repositoryClass=ProductRepository::class)
  */
 class Product
@@ -16,42 +45,50 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"read:Product:collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read:Product:collection", "write:Product:collection"})
      */
     private $model;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"read:Product:item", "write:Product:collection"})
      */
     private $description;
 
     /**
      * @ORM\Column(type="float")
+     * @Groups({"read:Product:item", "write:Product:collection"})
      */
     private $price;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"read:Product:item", "write:Product:collection"})
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Groups("read:Product:item")
      */
     private $created_at;
 
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @Groups("read:Product:item")
      */
     private $updated_at;
 
     /**
      * @ORM\ManyToOne(targetEntity=Brand::class, inversedBy="product")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"read:Product:collection", "write:Product:collection"})
      */
     private $brand;
 
@@ -113,9 +150,13 @@ class Product
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    /**
+     * @ORM\PrePersist()
+     * @return $this
+     */
+    public function setCreatedAt(): self
     {
-        $this->created_at = $created_at;
+        $this->created_at = new \DateTimeImmutable(null, new \DateTimeZone('Europe/Paris'));
 
         return $this;
     }
@@ -125,9 +166,13 @@ class Product
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updated_at): self
+    /**
+     * @ORM\PreUpdate()
+     * @return $this
+     */
+    public function setUpdatedAt(): self
     {
-        $this->updated_at = $updated_at;
+        $this->updated_at = new \DateTimeImmutable(null, new \DateTimeZone('Europe/Paris'));
 
         return $this;
     }
