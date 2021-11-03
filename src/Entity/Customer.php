@@ -13,6 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * @ApiResource()
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class Customer implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -165,9 +166,13 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
+    /**
+     * @ORM\PrePersist()
+     * @return $this
+     */
+    public function setCreatedAt(): self
     {
-        $this->created_at = $created_at;
+        $this->created_at = new \DateTimeImmutable(null, new \DateTimeZone('Europe/Paris'));
 
         return $this;
     }
