@@ -5,7 +5,9 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -38,6 +40,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * )
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @UniqueEntity(fields={"model"}, message="This value ( {{ value }} ) is already used.")
  */
 class Product
 {
@@ -52,24 +55,28 @@ class Product
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read:Product:collection", "write:Product:collection"})
+     * @Assert\NotBlank(message="This value should not be blank.")
      */
     private $model;
 
     /**
      * @ORM\Column(type="text")
      * @Groups({"read:Product:item", "write:Product:collection"})
+     * @Assert\NotBlank(message="This value should not be blank.")
      */
     private $description;
 
     /**
      * @ORM\Column(type="float")
      * @Groups({"read:Product:item", "write:Product:collection"})
+     * @Assert\NotBlank(message="This value should not be blank.")
      */
     private $price;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups({"read:Product:item", "write:Product:collection"})
+     * @Assert\NotBlank(message="This value should not be blank.")
      */
     private $quantity;
 
