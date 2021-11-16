@@ -62,7 +62,7 @@ class Brand
 
     /**
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="brand", orphanRemoval=true)
-     * @Groups({"read:Product:collection", "write:Product:collection", "read:Product:item"})
+     * @Groups({"read:Brand:collection", "read:Brand:item"})
      */
     private $product;
 
