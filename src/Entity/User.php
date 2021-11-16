@@ -5,13 +5,41 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *     normalizationContext={"groups"={"read:User:collection"}},
+ *     denormalizationContext={"groups"={"write:User:collection"}},
+ *     collectionOperations={
+ *          "get","post"
+ *      },
+ *     itemOperations={
+ *          "get"={
+ *                  "security" = "is_granted('ROLE_ADMIN') or object.getCustomer() == user",
+ *                  "security_message" = "Only view your own users",
+ *           },
+ *           "put"={
+ *                 "security" = "is_granted('ROLE_ADMIN') or object.getCustomer() == user",
+ *                 "security_message" = "Can replace only your own users.",
+ *           },
+ *            "patch"={
+ *                 "security" = "is_granted('ROLE_ADMIN') or object.getCustomer() == user",
+ *                  "security_message" = "Can update only your own users.",
+ *           },
+ *            "delete"={
+ *                 "security" = "is_granted('ROLE_ADMIN') or object.getCustomer() == user",
+ *                  "security_message" = "Can delete only your own users.",
+ *           }
+ *      }
+ * )
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity(fields={"email"}, message="This value ( {{ value }} ) is already used.")
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -19,11 +47,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"read:User:collection"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"read:User:collection", "write:User:collection"})
+     * @Assert\NotBlank(message="This value should not be blank.")
      */
     private $username;
 
@@ -35,56 +66,68 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups({"write:User:collection"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Groups({"read:User:collection", "write:User:collection"})
+     * @Assert\NotBlank(message="This value should not be blank.")
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"read:User:collection", "write:User:collection"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"read:User:collection", "write:User:collection"})
      */
     private $lastname;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Groups({"read:User:collection"})
      */
     private $created_at;
 
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
+     * @Groups({"read:User:collection"})
      */
     private $updated_at;
 
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
+     * @Groups({"read:User:collection", "write:User:collection"})
      */
     private $zip_code;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"read:User:collection", "write:User:collection"})
      */
     private $address;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
+     * @Groups({"read:User:collection", "write:User:collection"})
      */
     private $city;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"read:User:collection", "write:User:collection"})
      */
     private $phone_number;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"read:User:collection", "write:User:collection"})
      */
     private $country;
 
