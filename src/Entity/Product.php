@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ApiResource(
@@ -38,6 +41,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *           }
  *      }
  * )
+ * @ApiFilter(RangeFilter::class, properties={"price"})
+ * @ApiFilter(OrderFilter::class, properties={"price"}, arguments={"orderParameterName" : "order"})
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Entity(repositoryClass=ProductRepository::class)
  * @UniqueEntity(fields={"model"}, message="This value ( {{ value }} ) is already used.")
