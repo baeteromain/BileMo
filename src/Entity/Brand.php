@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\BrandRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -13,6 +14,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
+ *     subresourceOperations={
+ *         "products_get_subresource" = {
+ *                  "path" = "/brands/{id}/all-products",
+ *                   "openapi_context" = {
+ *                                "description" = "Retrieves all products by brand.",
+ *                                 "summary" = "Retrieves all products by brand."
+ *              }
+ *          }
+ *      },
  *     normalizationContext={"groups"={"read:Brand:collection"}},
  *     denormalizationContext={"groups"={"write:Brand:collection"}},
  *     collectionOperations={
@@ -61,6 +71,7 @@ class Brand
     private $name;
 
     /**
+     * @ApiSubresource()
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="brand", orphanRemoval=true)
      * @Groups({"read:Brand:collection", "read:Brand:item"})
      */
