@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,6 +16,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
+ *      subresourceOperations={
+ *         "users_get_subresource" = {
+ *                  "path" = "/customers/{id}/all-users",
+ *                   "openapi_context" = {
+ *                                "description" = "Retrieves all users by Customer.",
+ *                                 "summary" = "Retrieves all users by Customer."
+ *              }
+ *          }
+ *      },
+ *
  *     normalizationContext={"groups"={"read:Customer:collection"}},
  *     denormalizationContext={"groups"={"write:Customer:collection"}},
  *     collectionOperations={
@@ -22,7 +33,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "post"={
  *                  "security" = "is_granted('ROLE_ADMIN')",
  *                  "security_message" = "Only admins can add customers.",
- *           }
+ *           },
+
  *      },
  *     itemOperations={
  *          "get",
@@ -38,7 +50,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *                 "security" = "is_granted('ROLE_ADMIN')",
  *                  "security_message" = "Only admins can delete customers.",
  *           }
- *      }
+ *      },
  * )
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
  * @ORM\HasLifecycleCallbacks()
@@ -89,6 +101,7 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
      * @Groups({"read:Customer:collection", "write:Customer:collection"})
+     * @ApiSubresource()
      */
     private $user;
 
@@ -121,7 +134,7 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -129,7 +142,7 @@ class Customer implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
