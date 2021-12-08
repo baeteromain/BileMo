@@ -29,7 +29,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     normalizationContext={"groups"={"read:Customer:collection"}},
  *     denormalizationContext={"groups"={"write:Customer:collection"}},
  *     collectionOperations={
- *          "get",
+ *          "get" = {
+ *                 "security" = "is_granted('ROLE_ADMIN')",
+ *                 "security_message" = "Only admins can view all customers.",
+ *           },
  *          "post"={
  *                  "security" = "is_granted('ROLE_ADMIN')",
  *                  "security_message" = "Only admins can add customers.",
@@ -37,7 +40,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
  *      },
  *     itemOperations={
- *          "get",
+ *          "get"={
+ *                 "security" = "is_granted('ROLE_ADMIN')",
+ *                 "security_message" = "Only admins can view specific customer.",
+ *           },
  *           "put"={
  *                 "security" = "is_granted('ROLE_ADMIN')",
  *                 "security_message" = "Only admins can replace customers.",

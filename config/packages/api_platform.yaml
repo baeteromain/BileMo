@@ -12,3 +12,11 @@ api_platform:
             apiKey:
                 name: Authorization
                 type: header
+    http_cache:
+        public: true
+    defaults:
+        cache_header:
+            etag: true
+            max_age: 3600
+            shared_max_age: 3600
+            vary: [ 'Content-Type', 'Authorization' ]
