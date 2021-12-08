@@ -61,4 +61,4 @@ security:
     - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY }
     - { path: ^/api/brands, roles: [IS_AUTHENTICATED_FULLY, ROLE_USER ] }
     - { path: ^/api/products, roles: [IS_AUTHENTICATED_FULLY, ROLE_USER ] }
-    - { path: ^/api/customer, roles: [ ROLE_ADMIN ] }
+    - { path: ^/api/customer, roles: [IS_AUTHENTICATED_FULLY, ROLE_USER ] }
