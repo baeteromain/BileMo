@@ -36,6 +36,33 @@ class CustomerRepository extends ServiceEntityRepository implements PasswordUpgr
         $this->_em->flush();
     }
 
+    public function getRandomCustomerEmail($count = 1)
+    {
+        return  $this->createQueryBuilder('c')
+            ->select('c.email')
+            ->andWhere('c.roles != :role')
+            ->setParameter('role', ["ROLE_ADMIN"])
+            ->addSelect('RAND() as HIDDEN rand')
+            ->addOrderBy('rand')
+            ->setMaxResults($count)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getRandomCustomerId($count = 1)
+    {
+        return  $this->createQueryBuilder('c')
+            ->select('c.id')
+            ->andWhere('c.roles != :role')
+            ->setParameter('role', ["ROLE_ADMIN"])
+            ->addSelect('RAND() as HIDDEN rand')
+            ->addOrderBy('rand')
+            ->setMaxResults($count)
+            ->getQuery()
+            ->getResult();
+    }
+
+
     // /**
     //  * @return Customer[] Returns an array of Customer objects
     //  */
