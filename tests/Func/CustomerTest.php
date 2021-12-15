@@ -51,8 +51,10 @@ final class CustomerTest extends AbstractTest
      */
     public function testLoginAsCustomerToGetCustomer()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
+
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
@@ -99,8 +101,9 @@ final class CustomerTest extends AbstractTest
      */
     public function testCustomerGetUser()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
@@ -148,8 +151,9 @@ final class CustomerTest extends AbstractTest
      */
     public function testCustomerPostCustomer()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
@@ -197,8 +201,9 @@ final class CustomerTest extends AbstractTest
 
     public function testCustomerPostUser()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
@@ -227,9 +232,10 @@ final class CustomerTest extends AbstractTest
      */
     public function testAdminPutCustomer()
     {
+        $idCustomer = $this->ramdomCustomerId();
         $response = $this->createClientWithCredentials()->request(
             'PUT',
-            '/api/customers/6',
+            '/api/customers/' . $idCustomer[0]['id'],
             [
                 'body' => $this->getPayloadCustomer(),
                 'headers' => ['Content-Type' => 'application/json'],
@@ -251,14 +257,16 @@ final class CustomerTest extends AbstractTest
 
     public function testCustomerPutCustomer()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
+        $idCustomer = $this->ramdomCustomerId();
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
         $response = $this->createClientWithCredentials($token)->request(
             'PUT',
-            '/api/customers/6',
+            '/api/customers/' . $idCustomer[0]['id'],
             [
                 'body' => $this->getPayloadCustomer(),
                 'headers' => ['Content-Type' => 'application/json'],
@@ -276,9 +284,10 @@ final class CustomerTest extends AbstractTest
      */
     public function testAdminPutUser()
     {
+        $iduser = $this->ramdomUserId();
         $response = $this->createClientWithCredentials()->request(
             'PUT',
-            '/api/users/6',
+            '/api/users/' . $iduser[0]['id'],
             [
                 'body' => $this->getPayloadUser(),
                 'headers' => ['Content-Type' => 'application/json'],
@@ -300,14 +309,39 @@ final class CustomerTest extends AbstractTest
 
     public function testCustomerPutUser()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
+
+        $customer = static::getContainer()->get(CustomerRepository::class)->findOneBy(['email' => $emailCustomer[0]['email']]);
+        $users = static::getContainer()->get(UserRepository::class)->findBy(['customer' => $customer->getId()]);
+        $AllUsers = static::getContainer()->get(UserRepository::class)->findAll();
+
+        $all_user_id = [];
+        foreach ($AllUsers as $userall) {
+            $all_user_id[] = $userall->getId();
+        }
+
+        $user_id = [];
+        foreach ($users as $user) {
+            $user_id[] = $user->getId();
+        }
+        if (!empty($user_id)) {
+            $key = array_rand($user_id);
+            $id = $user_id[$key];
+        }
+
+        $noUserOfCustomer = array_diff($all_user_id, $user_id);
+
+        $keyNoUserOfCustomer = array_rand($noUserOfCustomer);
+        $noUserOfCustomer_id = $noUserOfCustomer[$keyNoUserOfCustomer];
+
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
         $response = $this->createClientWithCredentials($token)->request(
             'PUT',
-            '/api/users/13',
+            '/api/users/' .  $noUserOfCustomer_id,
             [
                 'body' => $this->getPayloadUser(),
                 'headers' => ['Content-Type' => 'application/json'],
@@ -319,21 +353,24 @@ final class CustomerTest extends AbstractTest
             'hydra:description' => 'Can replace only your own users.',
         ]);
 
-        $response = $this->createClientWithCredentials($token)->request(
-            'PUT',
-            '/api/users/33',
-            [
-                'body' => $this->getPayloadUser(),
-                'headers' => ['Content-Type' => 'application/json'],
-            ]
-        );
+        if (!empty($user_id)) {
 
-        $responseContent = $response->getContent();
-        $responseDecoded = json_decode($responseContent);
+            $response = $this->createClientWithCredentials($token)->request(
+                'PUT',
+                '/api/users/' . $id,
+                [
+                    'body' => $this->getPayloadUser(),
+                    'headers' => ['Content-Type' => 'application/json'],
+                ]
+            );
 
-        $this->assertResponseStatusCodeSame('200');
-        $this->assertJson($responseContent);
-        $this->assertNotEmpty($responseDecoded);
+            $responseContent = $response->getContent();
+            $responseDecoded = json_decode($responseContent);
+
+            $this->assertResponseStatusCodeSame('200');
+            $this->assertJson($responseContent);
+            $this->assertNotEmpty($responseDecoded);
+        }
 
     }
 
@@ -344,9 +381,10 @@ final class CustomerTest extends AbstractTest
      */
     public function testAdminPatchCustomer()
     {
+        $idCustomer = $this->ramdomCustomerId();
         $response = $this->createClientWithCredentials()->request(
             'PATCH',
-            '/api/customers/6',
+            '/api/customers/' . $idCustomer[0]['id'],
             [
                 'body' => '{"name" : "put3Name"}',
                 'headers' => ['Content-Type' => 'application/merge-patch+json'],
@@ -368,14 +406,16 @@ final class CustomerTest extends AbstractTest
 
     public function testCustomerPatchCustomer()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
+        $idCustomer = $this->ramdomCustomerId();
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
         $response = $this->createClientWithCredentials($token)->request(
             'PATCH',
-            '/api/customers/6',
+            '/api/customers/' . $idCustomer[0]['id'],
             [
                 'body' => '{"name" : "put4Name"}',
                 'headers' => ['Content-Type' => 'application/merge-patch+json'],
@@ -394,9 +434,10 @@ final class CustomerTest extends AbstractTest
      */
     public function testAdminPatchUser()
     {
+        $iduser = $this->ramdomUserId();
         $response = $this->createClientWithCredentials()->request(
             'PATCH',
-            '/api/users/6',
+            '/api/users/' . $iduser[0]['id'],
             [
                 'body' => '{"username" : "patchUsername"}',
                 'headers' => ['Content-Type' => 'application/merge-patch+json'],
@@ -418,14 +459,38 @@ final class CustomerTest extends AbstractTest
 
     public function testCustomerPatchUser()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
+        $customer = static::getContainer()->get(CustomerRepository::class)->findOneBy(['email' => $emailCustomer[0]['email']]);
+        $users = static::getContainer()->get(UserRepository::class)->findBy(['customer' => $customer->getId()]);
+        $AllUsers = static::getContainer()->get(UserRepository::class)->findAll();
+
+        $all_user_id = [];
+        foreach ($AllUsers as $userall) {
+            $all_user_id[] = $userall->getId();
+        }
+
+        $user_id = [];
+        foreach ($users as $user) {
+            $user_id[] = $user->getId();
+        }
+        if (!empty($user_id)) {
+            $key = array_rand($user_id);
+            $id = $user_id[$key];
+        }
+
+        $noUserOfCustomer = array_diff($all_user_id, $user_id);
+
+        $keyNoUserOfCustomer = array_rand($noUserOfCustomer);
+        $noUserOfCustomer_id = $noUserOfCustomer[$keyNoUserOfCustomer];
+
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
         $response = $this->createClientWithCredentials($token)->request(
             'PATCH',
-            '/api/users/6',
+            '/api/users/' . $noUserOfCustomer_id,
             [
                 'body' => '{"username" : "PatchNameCusto}',
                 'headers' => ['Content-Type' => 'application/merge-patch+json'],
@@ -437,21 +502,24 @@ final class CustomerTest extends AbstractTest
             'hydra:description' => 'Can update only your own users.',
         ]);
 
-        $response = $this->createClientWithCredentials($token)->request(
-            'PATCH',
-            '/api/users/33',
-            [
-                'body' => '{"username" : "PatchNameCusto"}',
-                'headers' => ['Content-Type' => 'application/merge-patch+json'],
-            ]
-        );
+        if (!empty($user_id)) {
+            $response = $this->createClientWithCredentials($token)->request(
+                'PATCH',
+                '/api/users/' . $id,
+                [
+                    'body' => '{"username" : "PatchNameCusto"}',
+                    'headers' => ['Content-Type' => 'application/merge-patch+json'],
+                ]
+            );
+            dump('/api/users/' . array_rand($user_id));
 
-        $responseContent = $response->getContent();
-        $responseDecoded = json_decode($responseContent);
+            $responseContent = $response->getContent();
+            $responseDecoded = json_decode($responseContent);
 
-        $this->assertResponseStatusCodeSame('200');
-        $this->assertJson($responseContent);
-        $this->assertNotEmpty($responseDecoded);
+            $this->assertResponseStatusCodeSame('200');
+            $this->assertJson($responseContent);
+            $this->assertNotEmpty($responseDecoded);
+        }
 
     }
 
@@ -462,10 +530,12 @@ final class CustomerTest extends AbstractTest
      */
     public function testAdminDeleteCustomer()
     {
-        $response = $this->createClientWithCredentials()->request('DELETE', '/api/customers/11');
+        $idCustomer = $this->ramdomCustomerId();
+        $response = $this->createClientWithCredentials()->request('DELETE', '/api/customers/' . $idCustomer[0]['id']);
+
 
         $this->assertResponseStatusCodeSame('204');
-        $this->assertNull(static::getContainer()->get(CustomerRepository::class)->findOneBy(['id' => '11']));
+        $this->assertNull(static::getContainer()->get(CustomerRepository::class)->findOneBy(['id' => $idCustomer[0]['id']]));
 
     }
 
@@ -474,12 +544,15 @@ final class CustomerTest extends AbstractTest
      */
     public function testCustomerDeleteCustomer()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
+        $idCustomer = $this->ramdomCustomerId();
+
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
-        $response = $this->createClientWithCredentials($token)->request('DELETE', '/api/customers/11');
+        $response = $this->createClientWithCredentials($token)->request('DELETE', '/api/customers/' . $idCustomer[0]['id']);
         $this->assertResponseStatusCodeSame('403', 'Access Denied.');
         $this->assertJsonContains([
             'hydra:description' => 'Only admins can delete customers.',
@@ -491,33 +564,63 @@ final class CustomerTest extends AbstractTest
      */
     public function testAdminDeleteUser()
     {
-        $response = $this->createClientWithCredentials()->request('DELETE', '/api/users/11');
+        $iduser = $this->ramdomUserId();
+
+        $response = $this->createClientWithCredentials()->request('DELETE', '/api/users/' . $iduser[0]['id']);
 
         $this->assertResponseStatusCodeSame('204');
-        $this->assertNull(static::getContainer()->get(UserRepository::class)->findOneBy(['id' => '11']));
+        $this->assertNull(static::getContainer()->get(UserRepository::class)->findOneBy(['id' => $iduser[0]['id']]));
 
     }
 
     /**
-     * @group DELETE
+     * @group DELETE22
      */
     public function testCustomerDeleteUser()
     {
+        $emailCustomer = $this->ramdomCustomerEmail();
+
+        $customer = static::getContainer()->get(CustomerRepository::class)->findOneBy(['email' => $emailCustomer[0]['email']]);
+        $users = static::getContainer()->get(UserRepository::class)->findBy(['customer' => $customer->getId()]);
+        $AllUsers = static::getContainer()->get(UserRepository::class)->findAll();
+
+        $all_user_id = [];
+        foreach ($AllUsers as $userall) {
+            $all_user_id[] = $userall->getId();
+        }
+
+        $user_id = [];
+        foreach ($users as $user) {
+            $user_id[] = $user->getId();
+        }
+        if (!empty($user_id)) {
+            $key = array_rand($user_id);
+            $id = $user_id[$key];
+        }
+
+        $noUserOfCustomer = array_diff($all_user_id, $user_id);
+
+        $keyNoUserOfCustomer = array_rand($noUserOfCustomer);
+        $noUserOfCustomer_id = $noUserOfCustomer[$keyNoUserOfCustomer];
+
         $token = $this->getToken([
-            'email' => 'ekris@medhurst.org',
+            'email' => $emailCustomer[0]['email'],
             'password' => 'azertyazerty',
         ]);
 
-        $response = $this->createClientWithCredentials($token)->request('DELETE', '/api/users/11');
+        $response = $this->createClientWithCredentials($token)->request('DELETE', '/api/users/' . $noUserOfCustomer_id);
         $this->assertResponseStatusCodeSame('403', 'Access Denied.');
         $this->assertJsonContains([
             'hydra:description' => 'Can delete only your own users.',
         ]);
 
-        $response = $this->createClientWithCredentials($token)->request('DELETE', '/api/users/33');
+        if (!empty($user_id)) {
+            $response = $this->createClientWithCredentials($token)->request('DELETE', '/api/users/' . $id);
 
-        $this->assertResponseStatusCodeSame('204');
-        $this->assertNull(static::getContainer()->get(UserRepository::class)->findOneBy(['id' => '33']));
+            $this->assertResponseStatusCodeSame('204');
+            $this->assertNull(static::getContainer()->get(UserRepository::class)->findOneBy(['id' => $id]));
+        }
+
     }
 
     private function getPayloadCustomer(): string
@@ -545,4 +648,20 @@ final class CustomerTest extends AbstractTest
             $faker->country,
             "15");
     }
+
+    private function ramdomCustomerEmail()
+    {
+        return static::getContainer()->get(CustomerRepository::class)->getRandomCustomerEmail();
+    }
+
+    private function ramdomCustomerId()
+    {
+        return static::getContainer()->get(CustomerRepository::class)->getRandomCustomerId();
+    }
+
+    private function ramdomUserId()
+    {
+        return static::getContainer()->get(UserRepository::class)->getRandomUserId();
+    }
+
 }
