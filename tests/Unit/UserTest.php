@@ -70,9 +70,9 @@ class UserTest extends TestCase
         self::assertInstanceOf(User::class, $response);
         self::assertEquals($details["lastname"], $this->user->getLastname());
 
-        $response = $this->user->setZipCode($details["zipcode"]);
+        $response = $this->user->setZip_Code($details["zipcode"]);
         self::assertInstanceOf(User::class, $response);
-        self::assertEquals($details["zipcode"], $this->user->getZipCode());
+        self::assertEquals($details["zipcode"], $this->user->getZip_Code());
 
         $response = $this->user->setAddress($details["address"]);
         self::assertInstanceOf(User::class, $response);
@@ -82,9 +82,9 @@ class UserTest extends TestCase
         self::assertInstanceOf(User::class, $response);
         self::assertEquals($details["city"], $this->user->getCity());
 
-        $response = $this->user->setPhoneNumber($details["phoneNumber"]);
+        $response = $this->user->setPhone_Number($details["phoneNumber"]);
         self::assertInstanceOf(User::class, $response);
-        self::assertEquals($details["phoneNumber"], $this->user->getPhoneNumber());
+        self::assertEquals($details["phoneNumber"], $this->user->getPhone_Number());
 
         $response = $this->user->setCountry($details["country"]);
         self::assertInstanceOf(User::class, $response);
