@@ -511,7 +511,6 @@ final class CustomerTest extends AbstractTest
                     'headers' => ['Content-Type' => 'application/merge-patch+json'],
                 ]
             );
-            dump('/api/users/' . array_rand($user_id));
 
             $responseContent = $response->getContent();
             $responseDecoded = json_decode($responseContent);
