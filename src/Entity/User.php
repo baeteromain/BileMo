@@ -293,12 +293,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getZipCode(): ?string
+    public function getZip_Code(): ?string
     {
         return $this->zip_code;
     }
 
-    public function setZipCode(?string $zip_code): self
+    public function setZip_Code(?string $zip_code): self
     {
         $this->zip_code = $zip_code;
 
@@ -329,12 +329,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPhoneNumber(): ?string
+    public function getPhone_Number(): ?string
     {
         return $this->phone_number;
     }
 
-    public function setPhoneNumber(?string $phone_number): self
+    public function setPhone_Number(?string $phone_number): self
     {
         $this->phone_number = $phone_number;
 
